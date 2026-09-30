@@ -33,14 +33,14 @@ def collect_snapshot(*, include_identity: bool = False) -> Snapshot:
         collected_at=datetime.now(timezone.utc).isoformat().replace("+00:00", "Z"),
         schema_version=SCHEMA_VERSION,
         os=platform.system(),
-        kernel=platform.release(),
+        kernel=platform.version() if platform.system() == "Windows" else platform.release(),
         architecture=platform.machine(),
         cpu=CpuInfo(
             psutil.cpu_count(), psutil.cpu_count(logical=False), psutil.cpu_percent(interval=0.3)
         ),
         memory=MemoryInfo(vm.total, vm.available, vm.used, vm.percent),
         disks=disks,
-        uptime_seconds=max(0.0, time.time() - psutil.boot_time()),
+        uptime_seconds=round(max(0.0, time.time() - psutil.boot_time()), 1),
         hostname=platform.node() if include_identity else None,
         username=getpass.getuser() if include_identity else None,
     )

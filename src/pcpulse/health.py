@@ -25,6 +25,19 @@ def run_checks(snapshot: Snapshot) -> list[HealthCheck]:
                 {"used_percent": mem},
             )
         )
+    load = snapshot.cpu.load_percent
+    if load is None:
+        checks.append(HealthCheck("cpu.load", "unknown", "CPU load is unavailable."))
+    elif load >= 90:
+        checks.append(
+            HealthCheck("cpu.load", "warning", "CPU load is high.", {"load_percent": load})
+        )
+    else:
+        checks.append(
+            HealthCheck(
+                "cpu.load", "ok", "CPU load is within the normal threshold.", {"load_percent": load}
+            )
+        )
     for d in snapshot.disks:
         v = d.used_percent
         if v is None:

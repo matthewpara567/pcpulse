@@ -1,10 +1,20 @@
 # Changelog
 
+## Unreleased
+
+- Markdown uptime is human-readable (for example `2h 16m`)
+- On Windows, `kernel` now reports the NT version instead of just `11`
+- `--include-identity` now adds hostname and username to Markdown output
+- `doctor` checks CPU load (warns at 90% or higher)
+
 ## 0.1.2
 
 - CI now runs on Linux, Windows, and macOS
 - Snapshot output is validated against the JSON Schema in tests
-- Fixed Markdown showing 'unavailable% used'n- doctor skips empty card readers and optical drivesn- Steadier CPU load sampling
+- Added RELEASING.md and a bug report issue template
+- Fixed Markdown showing 'unavailable% used'
+- `doctor` skips empty card readers and optical drives
+- Steadier CPU load sampling
 
 ## 0.1.1
 
