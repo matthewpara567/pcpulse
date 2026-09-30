@@ -2,7 +2,7 @@
 
 **Local-first, privacy-conscious, cross-platform PC diagnostics for humans, scripts, support tools, and developer applications.**
 
-PCPulse is an open-source Python library and CLI for collecting useful system diagnostics without requiring a cloud service. It turns local machine information into typed Python objects and stable machine-readable output.
+PCPulse (by Matthew Para, on PyPI as `pcpulse`) is an open-source Python library and CLI for collecting useful system diagnostics without requiring a cloud service. It turns local machine information into typed Python objects and stable machine-readable output.
 
 ## Highlights
 
@@ -19,7 +19,7 @@ PCPulse is an open-source Python library and CLI for collecting useful system di
 
 ## Installation
 
-Install the published package when available:
+Install from PyPI:
 
     python -m pip install pcpulse
 

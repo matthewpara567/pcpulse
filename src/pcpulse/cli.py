@@ -1,5 +1,6 @@
 import argparse
 import json
+from dataclasses import asdict
 
 from . import __version__, collect_snapshot, run_checks
 from .serialization import to_json, to_markdown
@@ -15,8 +16,9 @@ def build_parser() -> argparse.ArgumentParser:
     sub = parser.add_subparsers(dest="command", required=True)
 
     snapshot = sub.add_parser("snapshot", help="Collect a local system snapshot.")
-    snapshot.add_argument("--json", action="store_true")
-    snapshot.add_argument("--markdown", action="store_true")
+    fmt = snapshot.add_mutually_exclusive_group()
+    fmt.add_argument("--json", action="store_true")
+    fmt.add_argument("--markdown", action="store_true")
     snapshot.add_argument("--include-identity", action="store_true")
 
     doctor = sub.add_parser("doctor", help="Run conservative local health checks.")
@@ -54,7 +56,7 @@ def main() -> int:
     if args.command == "doctor":
         checks = run_checks(collect_snapshot())
         if args.json:
-            print(json.dumps([check.__dict__ for check in checks], indent=2))
+            print(json.dumps([asdict(check) for check in checks], indent=2))
         else:
             for check in checks:
                 print(f"[{check.status.upper()}] {check.message}")

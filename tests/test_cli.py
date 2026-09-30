@@ -1,5 +1,8 @@
 import sys
+
 from pcpulse.cli import main
+
+
 def test_schema_command(capsys):
     old=sys.argv
     try:
