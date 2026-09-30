@@ -19,6 +19,8 @@ def collect_snapshot(*, include_identity: bool = False) -> Snapshot:
             part.mountpoint in seen
             or part.fstype in _SKIP_FSTYPES
             or part.device.startswith("/dev/loop")
+            or not part.fstype
+            or "cdrom" in part.opts
         ):
             continue
         seen.add(part.mountpoint)
@@ -34,7 +36,7 @@ def collect_snapshot(*, include_identity: bool = False) -> Snapshot:
         kernel=platform.release(),
         architecture=platform.machine(),
         cpu=CpuInfo(
-            psutil.cpu_count(), psutil.cpu_count(logical=False), psutil.cpu_percent(interval=0.05)
+            psutil.cpu_count(), psutil.cpu_count(logical=False), psutil.cpu_percent(interval=0.3)
         ),
         memory=MemoryInfo(vm.total, vm.available, vm.used, vm.percent),
         disks=disks,

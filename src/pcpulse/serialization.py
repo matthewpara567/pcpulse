@@ -27,7 +27,7 @@ def to_markdown(snapshot: Snapshot) -> str:
     out += [f"| {k} | {v if v is not None else 'unavailable'} |" for k, v in rows]
     out += ["", "## Disks"]
     out += [
-        f"- {d.path}: {d.used_percent if d.used_percent is not None else 'unavailable'}% used"
+        f"- {d.path}: {f'{d.used_percent}% used' if d.used_percent is not None else 'unavailable'}"
         for d in snapshot.disks
     ]
     return "\n".join(out) + "\n"
