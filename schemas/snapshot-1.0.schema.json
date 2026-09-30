@@ -1,0 +1,31 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/matthewpara567/pcpulse/blob/main/schemas/snapshot-1.0.schema.json",
+  "title": "PCPulse Snapshot",
+  "type": "object",
+  "required": [
+    "collected_at",
+    "schema_version",
+    "os",
+    "kernel",
+    "architecture",
+    "cpu",
+    "memory",
+    "disks",
+    "uptime_seconds"
+  ],
+  "properties": {
+    "collected_at": { "type": "string" },
+    "schema_version": { "const": "1.0" },
+    "os": { "type": "string" },
+    "kernel": { "type": "string" },
+    "architecture": { "type": "string" },
+    "cpu": { "type": "object" },
+    "memory": { "type": "object" },
+    "disks": { "type": "array" },
+    "uptime_seconds": { "type": ["number", "null"] },
+    "hostname": { "type": ["string", "null"] },
+    "username": { "type": ["string", "null"] },
+    "extra": { "type": "object" }
+  }
+}
