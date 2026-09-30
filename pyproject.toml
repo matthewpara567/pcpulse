@@ -15,7 +15,7 @@ classifiers = ["Development Status :: 3 - Alpha", "Programming Language :: Pytho
 dependencies = ["psutil>=5.9,<8"]
 
 [project.optional-dependencies]
-dev = ["pytest>=8", "ruff>=0.6", "mypy>=1.11", "types-psutil"]
+dev = ["pytest>=8", "ruff>=0.6", "mypy>=1.11", "types-psutil", "jsonschema>=4.18"]
 
 [project.scripts]
 pcpulse = "pcpulse.cli:main"
