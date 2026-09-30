@@ -1,10 +1,10 @@
 # Changelog
 
-## Unreleased
+## 0.1.2
 
 - CI now runs on Linux, Windows, and macOS
 - Snapshot output is validated against the JSON Schema in tests
-- Added RELEASING.md and a bug report issue template
+- Fixed Markdown showing 'unavailable% used'n- doctor skips empty card readers and optical drivesn- Steadier CPU load sampling
 
 ## 0.1.1
 

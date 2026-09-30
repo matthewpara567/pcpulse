@@ -4,7 +4,7 @@ build-backend = "hatchling.build"
 
 [project]
 name = "pcpulse"
-version = "0.1.1"
+version = "0.1.2"
 description = "Privacy-first cross-platform PC diagnostics library and CLI."
 readme = "README.md"
 requires-python = ">=3.10"
