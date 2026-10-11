@@ -1,6 +1,6 @@
 # Changelog
 
-## Unreleased
+## 0.2.0
 
 - Snapshot schema 1.1 (additive): swap, battery, network, temperatures, fans, and optional processes
 - `doctor --fail-on warning|error|never` controls the exit code
