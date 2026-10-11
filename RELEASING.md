@@ -19,7 +19,8 @@ and creates a GitHub Release with the matching CHANGELOG notes.
 2. In `CHANGELOG.md`, rename `## Unreleased` to `## X.Y.Z`. The text under it
    becomes the GitHub Release notes.
 3. Commit and push to `main`, and wait for CI to go green.
-4. Tag and push: `git tag vX.Y.Z && git push --follow-tags`
+4. Tag and push by name: `git tag -a vX.Y.Z -m "Release X.Y.Z"; git push origin vX.Y.Z`
+   (`git push --follow-tags` does not push lightweight tags, so push the tag by name.)
 
 The workflow stops early if the tag doesn't match the package version or if
 CHANGELOG.md has no section for it. PyPI never accepts the same version twice,
