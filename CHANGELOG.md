@@ -2,6 +2,13 @@
 
 ## Unreleased
 
+- Snapshot schema 1.1 (additive): swap, battery, network, temperatures, fans, and optional processes
+- `doctor --fail-on warning|error|never` controls the exit code
+- Configurable thresholds: `--warn-mem`, `--error-mem`, `--warn-disk`, `--error-disk`, `--warn-cpu`, `--warn-swap`, `--error-swap`
+- New `doctor` checks for swap, temperature, and battery
+- `--output FILE` for `snapshot` and `doctor`
+- `--watch SECONDS` live mode for `snapshot` and `doctor`
+- `snapshot --include-processes --top N` lists top processes by memory (opt-in)
 - Markdown uptime is human-readable (for example `2h 16m`)
 - On Windows, `kernel` now reports the NT version instead of just `11`
 - `--include-identity` now adds hostname and username to Markdown output

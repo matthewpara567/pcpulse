@@ -2,7 +2,6 @@ import sys
 from importlib.metadata import version as distribution_version
 
 import pcpulse
-
 from pcpulse.cli import main
 
 
@@ -11,7 +10,7 @@ def test_schema_command(capsys):
     try:
         sys.argv = ["pcpulse", "schema"]
         assert main() == 0
-        assert capsys.readouterr().out.strip() == "1.0"
+        assert capsys.readouterr().out.strip() == "1.1"
     finally:
         sys.argv = old
 

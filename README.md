@@ -7,6 +7,7 @@ PCPulse (by Matthew Para, on PyPI as `pcpulse`) is an open-source Python library
 ## Highlights
 
 - Cross-platform system snapshots
+- Swap, battery, network, temperature, and fan information where available
 - CPU, memory, disk, OS, architecture, and uptime information
 - JSON and Markdown output
 - Conservative local health checks with `pcpulse doctor`
@@ -55,6 +56,24 @@ Identity information is excluded by default. Opt in explicitly:
 
     pcpulse snapshot --include-identity
 
+## Options
+
+Health checks and exit codes (useful in scripts and CI):
+
+    pcpulse doctor --fail-on warning
+    pcpulse doctor --warn-mem 80 --error-mem 90 --warn-disk 90 --warn-cpu 75 --warn-swap 40
+
+`--fail-on` accepts `warning`, `error` (default), or `never`. Threshold flags take a percentage from 0 to 100.
+
+Save a report to a file, or watch it live (Ctrl+C to stop):
+
+    pcpulse snapshot --json --output report.json
+    pcpulse doctor --watch 5
+
+Include the top processes by memory. This is opt-in because process names can be private:
+
+    pcpulse snapshot --include-processes --top 10
+
 ## Python API
 
     from pcpulse import collect_snapshot, run_checks
@@ -75,6 +94,8 @@ PCPulse is designed around a local-first model:
 - No account is required.
 - No cloud backend is required.
 - Hostname and username are not collected unless explicitly requested.
+- Process names are not collected unless explicitly requested.
+- Network data is limited to interface names and byte counters. IP and MAC addresses are never collected.
 - Collectors are read-only diagnostics and do not intentionally modify the host.
 - Applications should sanitize reports before sharing them externally.
 
@@ -84,17 +105,17 @@ A diagnostic report can still contain machine-specific information such as opera
 
 Snapshots carry an explicit schema version so consumers can distinguish format changes:
 
-    "schema_version": "1.0"
+    "schema_version": "1.1"
 
 The canonical JSON Schema is stored at:
 
-    schemas/snapshot-1.0.schema.json
+    schemas/snapshot-1.1.schema.json
 
 Consumers should treat schema changes as compatibility-sensitive and avoid assuming that every platform exposes every metric.
 
 ## Health checks
 
-`pcpulse doctor` performs conservative checks for conditions such as high memory usage and high disk utilization.
+`pcpulse doctor` performs conservative checks for conditions such as high memory, CPU, swap, and disk usage, high temperatures (where the OS exposes sensors), and a low battery. Checks for hardware a machine doesn't have, such as batteries on desktops, are simply left out.
 
 A check can report:
 
@@ -197,7 +218,6 @@ PCPulse follows a few simple principles:
 Potential future work includes:
 
 - More detailed platform-specific hardware metrics
-- Battery, temperature, and fan information where safely available
 - Pluggable collectors
 - Richer diagnostic bundles
 - More schema validation tooling

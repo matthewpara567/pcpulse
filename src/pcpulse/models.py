@@ -1,5 +1,7 @@
 from dataclasses import asdict, dataclass, field
-from typing import Any
+from typing import Any, Literal
+
+Status = Literal["ok", "warning", "error", "unknown"]
 
 
 @dataclass(frozen=True)
@@ -26,6 +28,41 @@ class DiskInfo:
 
 
 @dataclass(frozen=True)
+class SwapInfo:
+    total_bytes: int | None
+    used_bytes: int | None
+    used_percent: float | None
+
+
+@dataclass(frozen=True)
+class BatteryInfo:
+    percent: float | None
+    plugged_in: bool | None
+
+
+@dataclass(frozen=True)
+class NetworkInterface:
+    name: str
+    is_up: bool | None
+    bytes_sent: int | None
+    bytes_recv: int | None
+
+
+@dataclass(frozen=True)
+class SensorReading:
+    label: str
+    value: float
+
+
+@dataclass(frozen=True)
+class ProcessInfo:
+    pid: int
+    name: str
+    memory_percent: float | None
+    rss_bytes: int | None
+
+
+@dataclass(frozen=True)
 class Snapshot:
     collected_at: str
     schema_version: str
@@ -39,6 +76,12 @@ class Snapshot:
     hostname: str | None = None
     username: str | None = None
     extra: dict[str, Any] = field(default_factory=dict)
+    swap: SwapInfo | None = None
+    battery: BatteryInfo | None = None
+    network: list[NetworkInterface] = field(default_factory=list)
+    temperatures: list[SensorReading] = field(default_factory=list)
+    fans: list[SensorReading] = field(default_factory=list)
+    processes: list[ProcessInfo] | None = None
 
     def to_dict(self) -> dict[str, Any]:
         return asdict(self)
@@ -47,6 +90,6 @@ class Snapshot:
 @dataclass(frozen=True)
 class HealthCheck:
     id: str
-    status: str
+    status: Status
     message: str
     details: dict[str, Any] = field(default_factory=dict)

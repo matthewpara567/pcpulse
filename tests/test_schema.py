@@ -5,7 +5,7 @@ from jsonschema import Draft202012Validator
 
 from pcpulse import collect_snapshot
 
-SCHEMA = Path(__file__).resolve().parents[1] / "schemas" / "snapshot-1.0.schema.json"
+SCHEMA = Path(__file__).resolve().parents[1] / "schemas" / "snapshot-1.1.schema.json"
 
 
 def _validator() -> Draft202012Validator:
