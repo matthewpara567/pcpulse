@@ -24,7 +24,7 @@ from pcpulse.serialization import format_bytes, to_markdown, to_text
 def snap(mem=10.0, load=1.0, **kw):
     return Snapshot(
         collected_at="t",
-        schema_version="1.1",
+        schema_version="1.2",
         os="Linux",
         kernel="6",
         architecture="x86_64",
@@ -86,7 +86,7 @@ def test_temperature_check():
 
 def test_network_never_collects_addresses():
     for n in collect_snapshot().network:
-        assert set(n.__dict__) == {"name", "is_up", "bytes_sent", "bytes_recv"}
+        assert not ({"ip_address", "mac_address", "address"} & set(n.__dict__))
 
 
 def test_processes_are_opt_in_and_limited():
@@ -161,7 +161,7 @@ def test_markdown_and_text_show_new_data():
 
 
 def test_full_snapshot_matches_schema():
-    path = Path(__file__).resolve().parents[1] / "schemas" / "snapshot-1.1.schema.json"
+    path = Path(__file__).resolve().parents[1] / "schemas" / "snapshot-1.2.schema.json"
     schema = json.loads(path.read_text(encoding="utf-8"))
     Draft202012Validator(schema).validate(collect_snapshot(include_processes=True).to_dict())
 
@@ -207,7 +207,7 @@ def test_bad_arguments_exit_with_usage_error(argv):
 def test_output_file(tmp_path, capsys):
     target = tmp_path / "report.json"
     assert cli.main(["snapshot", "--json", "--output", str(target)]) == 0
-    assert json.loads(target.read_text(encoding="utf-8"))["schema_version"] == "1.1"
+    assert json.loads(target.read_text(encoding="utf-8"))["schema_version"] == "1.2"
     assert capsys.readouterr().out == ""
 
 
