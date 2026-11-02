@@ -11,7 +11,7 @@ PCPulse (by Matthew Para, on PyPI as `pcpulse`) is an open-source Python library
 - CPU, memory, disk, OS, architecture, and uptime information
 - JSON and Markdown output
 - Conservative local health checks with `pcpulse doctor`
-- Versioned snapshot schema
+- Versioned snapshot schema (currently 1.2)
 - Privacy-first identity handling
 - Python library API for integration into other tools
 - No telemetry or mandatory network service
@@ -74,6 +74,17 @@ Include the top processes by memory. This is opt-in because process names can be
 
     pcpulse snapshot --include-processes --top 10
 
+Create a ZIP report (review before sharing because it may contain system information):
+
+    pcpulse report --output diagnostic-report.zip
+    pcpulse report --output report.zip --include-processes --include-identity
+
+Export the JSON Schema:
+
+    pcpulse schema --output snapshot-schema.json
+
+GPU metrics use `nvidia-smi` when available and Linux DRM sysfs where exposed. SMART storage details are optional and require `smartctl`; some devices require elevated privileges. Network and disk throughput are sampled locally over a short interval. Unsupported hardware metrics are omitted rather than guessed.
+
 ## Python API
 
     from pcpulse import collect_snapshot, run_checks
@@ -95,7 +106,7 @@ PCPulse is designed around a local-first model:
 - No cloud backend is required.
 - Hostname and username are not collected unless explicitly requested.
 - Process names are not collected unless explicitly requested.
-- Network data is limited to interface names and byte counters. IP and MAC addresses are never collected.
+- Network data is limited to interface names, byte counters, and optional throughput rates. IP and MAC addresses are never collected.
 - Collectors are read-only diagnostics and do not intentionally modify the host.
 - Applications should sanitize reports before sharing them externally.
 
@@ -105,11 +116,11 @@ A diagnostic report can still contain machine-specific information such as opera
 
 Snapshots carry an explicit schema version so consumers can distinguish format changes:
 
-    "schema_version": "1.1"
+    "schema_version": "1.2"
 
 The canonical JSON Schema is stored at:
 
-    schemas/snapshot-1.1.schema.json
+    schemas/snapshot-1.2.schema.json
 
 Consumers should treat schema changes as compatibility-sensitive and avoid assuming that every platform exposes every metric.
 
