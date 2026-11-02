@@ -1,7 +1,6 @@
 """Stable JSON, text, Markdown, and report serialization."""
 import json
 import math
-import re
 from dataclasses import asdict
 from typing import Any
 
@@ -76,6 +75,10 @@ def _md(value: object) -> str:
     return text.replace("\\", "\\\\").replace("|", "\\|").replace("\r", " ").replace("\n", " ").replace("<", "&lt;").replace(">", "&gt;")
 
 
+def _temp(value: float | None) -> str:
+    return f"{value:.1f} C" if value is not None and math.isfinite(value) else "unavailable"
+
+
 def _rate(value: float | None) -> str:
     if value is None or not math.isfinite(value):
         return "unavailable"
@@ -147,7 +150,7 @@ def to_markdown(snapshot: Snapshot) -> str:
     if snapshot.gpus:
         out += ["", "## GPUs"]
         for gpu in snapshot.gpus:
-            out.append(f"- {_md(gpu.name)} ({_md(gpu.vendor or 'unknown')}): load {_md(_pct(gpu.utilization_percent))}, VRAM {_md(format_bytes(gpu.memory_used_bytes))} / {_md(format_bytes(gpu.memory_total_bytes))}, temperature {_md(_pct(gpu.temperature_celsius))}")
+            out.append(f"- {_md(gpu.name)} ({_md(gpu.vendor or 'unknown')}): load {_md(_pct(gpu.utilization_percent))}, VRAM {_md(format_bytes(gpu.memory_used_bytes))} / {_md(format_bytes(gpu.memory_total_bytes))}, temperature {_md(_temp(gpu.temperature_celsius))}")
     if snapshot.storage_health:
         out += ["", "## Storage health"]
         for device in snapshot.storage_health:
