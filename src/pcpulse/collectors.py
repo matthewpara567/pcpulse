@@ -1,5 +1,7 @@
 """Best-effort, local-only system collectors.
 
+# ruff: noqa: BLE001 - collectors intentionally isolate arbitrary OS/driver failures.
+
 Optional probes never prevent the rest of a snapshot from being returned.
 External tools are invoked only with fixed argument lists (never through a shell).
 """
@@ -170,8 +172,10 @@ def _network(
     if sample_interval_seconds > 0:
         start = time.monotonic()
         time.sleep(sample_interval_seconds)
-        after = _safe("network.counters", lambda: psutil.net_io_counters(pernic=True), {}, errors)
-        elapsed = max(time.monotonic() - start, 0.001)
+        sampled = _safe("network.counters", lambda: psutil.net_io_counters(pernic=True), None, errors)
+        after = sampled if sampled is not None else before
+        if sampled is not None:
+            elapsed = max(time.monotonic() - start, 0.001)
     out: list[NetworkInterface] = []
     for name in sorted(stats):
         if name == "lo" or name.lower().startswith("loopback"):
@@ -206,8 +210,10 @@ def _disk_io(sample_interval_seconds: float, errors: list[CollectionError]) -> D
     if sample_interval_seconds > 0:
         start = time.monotonic()
         time.sleep(sample_interval_seconds)
-        after = _safe("disk.io", psutil.disk_io_counters, before, errors)
-        elapsed = max(time.monotonic() - start, 0.001)
+        sampled = _safe("disk.io", psutil.disk_io_counters, None, errors)
+        if sampled is not None:
+            after = sampled
+            elapsed = max(time.monotonic() - start, 0.001)
     read_rate = write_rate = None
     if elapsed:
         read_rate = _finite(max(0, after.read_bytes - before.read_bytes) / elapsed)
@@ -442,23 +448,35 @@ def _storage_health(errors: list[CollectionError]) -> list[StorageHealthInfo]:
             except json.JSONDecodeError:
                 _record_error(errors, "storage.smartctl", RuntimeError("Invalid smartctl JSON"))
                 continue
+            if not isinstance(data, dict):
+                _record_error(errors, "storage.smartctl", ValueError("SMART JSON root is not an object"))
+                continue
             nvme = data.get("nvme_smart_health_information_log") or {}
+            if not isinstance(nvme, dict):
+                nvme = {}
             temp = _finite(nvme.get("temperature"))
             percentage_used = _finite(nvme.get("percentage_used"))
-            power_hours = nvme.get("power_on_time", {}).get("hours")
+            power_on_time = nvme.get("power_on_time")
+            power_hours = power_on_time.get("hours") if isinstance(power_on_time, dict) else None
             if temp is None:
                 temp = _finite((data.get("temperature") or {}).get("current"))
             if temp is None:
-                for attr in (data.get("ata_smart_attributes") or {}).get("table", []):
-                    if attr.get("id") == 194:
-                        raw = attr.get("raw", {}).get("value")
+                ata = data.get("ata_smart_attributes") or {}
+                table = ata.get("table", []) if isinstance(ata, dict) else []
+                for attr in table if isinstance(table, list) else []:
+                    if isinstance(attr, dict) and attr.get("id") == 194:
+                        raw_data = attr.get("raw")
+                        raw = raw_data.get("value") if isinstance(raw_data, dict) else None
                         temp = _finite(raw)
                         break
-            passed = (data.get("smart_status") or {}).get("passed")
+            smart_status = data.get("smart_status") or {}
+            passed = smart_status.get("passed") if isinstance(smart_status, dict) else None
             health_status = "passed" if passed is True else "failed" if passed is False else "unknown"
             model = data.get("model_name") or data.get("model_family")
-            if data.get("smartctl", {}).get("exit_status", 0) != 0 and health_status == "unknown":
-                _record_error(errors, "storage.smartctl", PermissionError())
+            smartctl_meta = data.get("smartctl") or {}
+            exit_status = smartctl_meta.get("exit_status", 0) if isinstance(smartctl_meta, dict) else 0
+            if exit_status != 0 and health_status == "unknown":
+                _record_error(errors, "storage.smartctl", RuntimeError("smartctl reported an unsuccessful or incomplete query"))
             out.append(
                 StorageHealthInfo(
                     device=device,
