@@ -7,7 +7,6 @@ import csv
 import getpass
 import json
 import math
-import os
 import platform
 import re
 import shutil
