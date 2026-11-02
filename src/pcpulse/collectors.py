@@ -459,7 +459,8 @@ def _storage_health(errors: list[CollectionError]) -> list[StorageHealthInfo]:
             power_on_time = nvme.get("power_on_time")
             power_hours = power_on_time.get("hours") if isinstance(power_on_time, dict) else None
             if temp is None:
-                temp = _finite((data.get("temperature") or {}).get("current"))
+                temperature_data = data.get("temperature") or {}
+                temp = _finite(temperature_data.get("current")) if isinstance(temperature_data, dict) else None
             if temp is None:
                 ata = data.get("ata_smart_attributes") or {}
                 table = ata.get("table", []) if isinstance(ata, dict) else []
@@ -484,7 +485,7 @@ def _storage_health(errors: list[CollectionError]) -> list[StorageHealthInfo]:
                     health_status=health_status,
                     temperature_celsius=temp,
                     percentage_used=percentage_used,
-                    power_on_hours=int(power_hours) if isinstance(power_hours, (int, float)) else None,
+                    power_on_hours=int(power_hours) if isinstance(power_hours, (int, float)) and math.isfinite(power_hours) and power_hours >= 0 else None,
                 )
             )
         except Exception as exc:
