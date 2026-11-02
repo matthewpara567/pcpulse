@@ -156,6 +156,10 @@ Run type checking:
 
     mypy src
 
+## Platform support
+
+PCPulse is tested on Ubuntu, Windows, and macOS with Python 3.10–3.14 in GitHub Actions. Individual hardware metrics remain dependent on OS support, permissions, and hardware. See [the platform support guide](docs/platform-support.md) for details.
+
 ## Contributing
 
 Bug fixes, documentation improvements, tests, platform compatibility work, and carefully scoped features are welcome.
@@ -169,7 +173,7 @@ Before opening a pull request:
 - Run the test, lint, and type-check commands.
 - Avoid unrelated formatting churn.
 
-See CONTRIBUTING.md for details.
+See [CONTRIBUTING.md](CONTRIBUTING.md) for details, or open a [bug report](https://github.com/matthewpara567/pcpulse/issues/new?template=bug_report.md) or [feature request](https://github.com/matthewpara567/pcpulse/issues/new?template=feature_request.md).
 
 ## Security
 
@@ -232,4 +236,4 @@ PCPulse is released under the MIT License. See LICENSE.
 
 ## Status
 
-PCPulse is currently an early open-source project. APIs and schema details may evolve before the first stable release.
+PCPulse is an early-stage open-source project (Alpha). APIs and schema details may evolve; review the changelog before upgrading.
