@@ -91,15 +91,23 @@ def run_checks(snapshot: Snapshot, thresholds: Thresholds | None = None) -> list
         # to conservative defaults. Thresholds are sensor-specific, not universal.
         for sensor in snapshot.temperatures:
             warn = sensor.high_celsius if sensor.high_celsius is not None and 0 < sensor.high_celsius <= 150 else t.temp_warn
-            error = sensor.critical_celsius if sensor.critical_celsius is not None and warn <= sensor.critical_celsius <= 200 else t.temp_error
-            if error < warn:
-                error = t.temp_error
+            error = sensor.critical_celsius if sensor.critical_celsius is not None and warn <= sensor.critical_celsius <= 200 else max(t.temp_error, warn)
             status = _level(sensor.value, warn, error)
             checks.append(HealthCheck(
                 f"temperature:{sensor.label}", status,
                 f"Temperature is {_PHRASE[status]} ({sensor.label}: {sensor.value:.1f} C).",
                 {"label": sensor.label, "celsius": sensor.value, "warn_celsius": warn, "error_celsius": error},
             ))
+        # Retain the original aggregate check ID for integrations using it.
+        hottest = max(snapshot.temperatures, key=lambda item: item.value)
+        warn = hottest.high_celsius if hottest.high_celsius is not None and 0 < hottest.high_celsius <= 150 else t.temp_warn
+        error = hottest.critical_celsius if hottest.critical_celsius is not None and warn <= hottest.critical_celsius <= 200 else max(t.temp_error, warn)
+        status = _level(hottest.value, warn, error)
+        checks.append(HealthCheck(
+            "temperature.max", status,
+            f"Maximum temperature is {_PHRASE[status]} ({hottest.label}: {hottest.value:.1f} C).",
+            {"label": hottest.label, "celsius": hottest.value, "warn_celsius": warn, "error_celsius": error},
+        ))
 
     for gpu in snapshot.gpus:
         if gpu.utilization_percent is not None:
