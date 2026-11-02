@@ -134,6 +134,10 @@ def to_markdown(snapshot: Snapshot) -> str:
         for label, value in (("CPU model", snapshot.hardware.cpu_model), ("System model", snapshot.hardware.system_model), ("Motherboard", snapshot.hardware.motherboard_model)):
             if value:
                 rows.append((label, value))
+    if snapshot.hostname is not None:
+        rows.append(("Hostname", snapshot.hostname))
+    if snapshot.username is not None:
+        rows.append(("Username", snapshot.username))
     if snapshot.swap is not None:
         rows.append(("Swap used", snapshot.swap.used_percent))
     battery = _battery(snapshot)
