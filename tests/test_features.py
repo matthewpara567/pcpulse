@@ -75,10 +75,12 @@ def test_battery_check():
 
 
 def test_temperature_check():
-    assert "temperature.max" not in ids(run_checks(snap()))
+    assert not any(check.id.startswith("temperature:") for check in run_checks(snap()))
     for value, expected in [(60.0, "ok"), (90.0, "warning"), (96.0, "error")]:
         temps = [SensorReading("a", 40.0), SensorReading("b", value)]
-        assert status(run_checks(snap(temperatures=temps)), "temperature.max") == expected
+        checks = run_checks(snap(temperatures=temps))
+        assert status(checks, "temperature:a") == "ok"
+        assert status(checks, "temperature:b") == expected
 
 
 # --- collectors -------------------------------------------------------------
@@ -148,7 +150,7 @@ def test_markdown_and_text_show_new_data():
         "| Swap used | 10.0 |",
         "80.0% (plugged in)",
         "## Network",
-        "eth0: up, sent 2.0 KB, received 4.0 KB",
+        "| eth0 | up | unavailable | unavailable |",
         "cpu:core: 55.0 C",
         "case:0: 1200 RPM",
         "| 1 | init | 1.0 KB |",
