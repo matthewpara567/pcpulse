@@ -105,7 +105,7 @@ def to_text(snapshot: Snapshot) -> str:
     for gpu in snapshot.gpus:
         lines.append(f"GPU: {gpu.name}; load {_pct(gpu.utilization_percent)}; VRAM {format_bytes(gpu.memory_used_bytes)} / {format_bytes(gpu.memory_total_bytes)}")
     for device in snapshot.storage_health:
-        lines.append(f"Storage health {device.device}: {device.health_status}; temperature {_pct(device.temperature_celsius)}; wear {_pct(device.percentage_used)}")
+        lines.append(f"Storage health {device.device}: {device.health_status}; temperature {_temp(device.temperature_celsius)}; wear {_pct(device.percentage_used)}")
     if snapshot.swap is not None and snapshot.swap.used_percent is not None:
         lines.append(f"Swap: {snapshot.swap.used_percent}% used")
     battery = _battery(snapshot)
