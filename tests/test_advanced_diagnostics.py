@@ -1,7 +1,6 @@
 import json
 import math
 import zipfile
-from pathlib import Path
 
 import pytest
 
@@ -13,11 +12,13 @@ from pcpulse.serialization import to_json, to_markdown
 
 
 def minimal_snapshot(**kwargs):
-    return Snapshot(
-        collected_at="now", schema_version="1.2", os="Linux", kernel="test",
-        architecture="x86_64", cpu=CpuInfo(4, 2, 10.0),
-        memory=MemoryInfo(100, 80, 20, 20.0), **kwargs
-    )
+    values = {
+        "collected_at": "now", "schema_version": "1.2", "os": "Linux",
+        "kernel": "test", "architecture": "x86_64",
+        "cpu": CpuInfo(4, 2, 10.0), "memory": MemoryInfo(100, 80, 20, 20.0),
+    }
+    values.update(kwargs)
+    return Snapshot(**values)
 
 
 @pytest.mark.parametrize("kwargs", [
