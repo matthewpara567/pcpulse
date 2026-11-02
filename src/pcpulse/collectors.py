@@ -5,6 +5,7 @@
 Optional probes never prevent the rest of a snapshot from being returned.
 External tools are invoked only with fixed argument lists (never through a shell).
 """
+# ruff: noqa: BLE001 - isolate arbitrary failures from optional OS and driver probes.
 import csv
 import getpass
 import json
