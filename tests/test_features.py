@@ -112,6 +112,7 @@ def test_fake_sensors_and_battery(monkeypatch):
     )
     monkeypatch.setattr(psutil, "sensors_fans", lambda: {"case": [fan("", 1200)]}, raising=False)
     monkeypatch.setattr(psutil, "sensors_battery", lambda: batt(42, 3600, False), raising=False)
+    monkeypatch.setattr("pcpulse.collectors._linux_battery_metadata", lambda: (None, None, None))
     s = collect_snapshot()
     assert s.temperatures == [SensorReading("cpu:core", 55.0)]
     assert s.fans == [SensorReading("case:0", 1200.0)]
