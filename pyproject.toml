@@ -8,7 +8,8 @@ dynamic = ["version"]
 description = "Privacy-first cross-platform PC diagnostics library and CLI."
 readme = "README.md"
 requires-python = ">=3.10"
-license = { file = "LICENSE" }
+license = "MIT"
+license-files = ["LICENSE"]
 authors = [{ name = "Matthew Para" }]
 keywords = ["diagnostics", "system", "hardware", "pc", "cli", "privacy"]
 classifiers = ["Development Status :: 3 - Alpha", "Programming Language :: Python :: 3", "Operating System :: OS Independent"]
@@ -32,6 +33,14 @@ line-length = 100
 [tool.mypy]
 python_version = "3.10"
 strict = true
+
+[project.urls]
+Homepage = "https://github.com/matthewpara567/pcpulse"
+Repository = "https://github.com/matthewpara567/pcpulse"
+Issues = "https://github.com/matthewpara567/pcpulse/issues"
+
+[tool.hatch.build.targets.wheel.force-include]
+"schemas/snapshot-1.2.schema.json" = "pcpulse/schemas/snapshot-1.2.schema.json"
 
 [tool.hatch.version]
 path = "src/pcpulse/__init__.py"

@@ -24,7 +24,7 @@ from pcpulse.serialization import format_bytes, to_markdown, to_text
 def snap(mem=10.0, load=1.0, **kw):
     return Snapshot(
         collected_at="t",
-        schema_version="1.1",
+        schema_version="1.2",
         os="Linux",
         kernel="6",
         architecture="x86_64",
@@ -75,10 +75,12 @@ def test_battery_check():
 
 
 def test_temperature_check():
-    assert "temperature.max" not in ids(run_checks(snap()))
+    assert not any(check.id.startswith("temperature:") for check in run_checks(snap()))
     for value, expected in [(60.0, "ok"), (90.0, "warning"), (96.0, "error")]:
         temps = [SensorReading("a", 40.0), SensorReading("b", value)]
-        assert status(run_checks(snap(temperatures=temps)), "temperature.max") == expected
+        checks = run_checks(snap(temperatures=temps))
+        assert status(checks, "temperature:a") == "ok"
+        assert status(checks, "temperature:b") == expected
 
 
 # --- collectors -------------------------------------------------------------
@@ -86,7 +88,7 @@ def test_temperature_check():
 
 def test_network_never_collects_addresses():
     for n in collect_snapshot().network:
-        assert set(n.__dict__) == {"name", "is_up", "bytes_sent", "bytes_recv"}
+        assert not ({"ip_address", "mac_address", "address"} & set(n.__dict__))
 
 
 def test_processes_are_opt_in_and_limited():
@@ -110,6 +112,7 @@ def test_fake_sensors_and_battery(monkeypatch):
     )
     monkeypatch.setattr(psutil, "sensors_fans", lambda: {"case": [fan("", 1200)]}, raising=False)
     monkeypatch.setattr(psutil, "sensors_battery", lambda: batt(42, 3600, False), raising=False)
+    monkeypatch.setattr("pcpulse.collectors._linux_battery_metadata", lambda: (None, None, None))
     s = collect_snapshot()
     assert s.temperatures == [SensorReading("cpu:core", 55.0)]
     assert s.fans == [SensorReading("case:0", 1200.0)]
@@ -148,7 +151,7 @@ def test_markdown_and_text_show_new_data():
         "| Swap used | 10.0 |",
         "80.0% (plugged in)",
         "## Network",
-        "eth0: up, sent 2.0 KB, received 4.0 KB",
+        "| eth0 | up | unavailable | unavailable |",
         "cpu:core: 55.0 C",
         "case:0: 1200 RPM",
         "| 1 | init | 1.0 KB |",
@@ -161,7 +164,7 @@ def test_markdown_and_text_show_new_data():
 
 
 def test_full_snapshot_matches_schema():
-    path = Path(__file__).resolve().parents[1] / "schemas" / "snapshot-1.1.schema.json"
+    path = Path(__file__).resolve().parents[1] / "schemas" / "snapshot-1.2.schema.json"
     schema = json.loads(path.read_text(encoding="utf-8"))
     Draft202012Validator(schema).validate(collect_snapshot(include_processes=True).to_dict())
 
@@ -207,7 +210,7 @@ def test_bad_arguments_exit_with_usage_error(argv):
 def test_output_file(tmp_path, capsys):
     target = tmp_path / "report.json"
     assert cli.main(["snapshot", "--json", "--output", str(target)]) == 0
-    assert json.loads(target.read_text(encoding="utf-8"))["schema_version"] == "1.1"
+    assert json.loads(target.read_text(encoding="utf-8"))["schema_version"] == "1.2"
     assert capsys.readouterr().out == ""
 
 

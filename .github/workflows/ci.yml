@@ -22,3 +22,12 @@ jobs:
       - run: pytest -q
       - run: ruff check .
       - run: mypy src
+      - name: Build distribution and check package metadata
+        run: |
+          python -m pip install build twine
+          python -m build
+          python -m twine check dist/*
+      - name: Verify installed wheel includes the schema resource
+        run: |
+          python -m pip install --no-deps dist/*.whl
+          python -c "from importlib.resources import files; assert files('pcpulse').joinpath('schemas/snapshot-1.2.schema.json').is_file()"

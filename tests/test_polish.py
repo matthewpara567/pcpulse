@@ -8,7 +8,7 @@ from pcpulse.serialization import format_uptime, to_markdown
 def _snap(load, **kw):
     return Snapshot(
         collected_at="t",
-        schema_version="1.1",
+        schema_version="1.2",
         os="Linux",
         kernel="6",
         architecture="x86_64",
