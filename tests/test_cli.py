@@ -10,7 +10,7 @@ def test_schema_command(capsys):
     try:
         sys.argv = ["pcpulse", "schema"]
         assert main() == 0
-        assert capsys.readouterr().out.strip() == "1.1"
+        assert capsys.readouterr().out.strip() == "1.2"
     finally:
         sys.argv = old
 
